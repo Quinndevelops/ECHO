@@ -158,12 +158,32 @@
             margin-bottom: 10px;
             img-align: center;
         }
+ @keyframes rainbow {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.rainbow-text {
+    background: linear-gradient(to right, #FF3C7E, #4AC7F2, #A0D368, #FBB262, #FF3C7E);
+    -webkit-background-clip: text;
+    color: transparent;
+    background-size: 700% 600%; /* Added this line for background-size */
+    animation: rainbow 8s linear infinite; text-align: center;
+}
+
     </style>
 </head>
 <body>
     <!-- Splash screen -->
     <div id="splash">
-        <h1>Welcome</h1>
+        <h1 class="rainbow-text">Welcome</h1>
 	    <h3>Human Verification Required Enter "1776"</h3>
         <input type="password" inputmode="numeric" placeholder="password" id="passwordInput">
         <button onclick="checkPassword()" class="submit">Submit</button>
@@ -176,7 +196,7 @@
 			<option>Article Finder</option>
 			<option>About Section</option>
 		</select>
-        <h1 style="text-align: center;">ECHO</h1>
+        <h1 class="rainbow-text">ECHO</h1>
         <div style="text-align: center;">
             <input type="text" id="searchInput" placeholder="Enter article title">
         </div>
@@ -184,7 +204,7 @@
             <button onclick="searchArticle()" class="search">Search</button>
         </div> <div id="result"></div>
 <div id="images">
-    <h2 style="text-align: center;">Images</h2>
+    <h1 class="rainbow-text">Images</h1>
     <!-- Images will be displayed here -->
 </div>
 
@@ -196,8 +216,8 @@
 			<option>About Section</option>
 			<option>Article Finder</option>
 		</select>
-    <h1>About ECHO</h1>
-    <p>ECHO is a Tool where you can look up information, ECHO will hunt it for you via wikipedia.</p> <h1>Version</h1> <p>0.1</p> <p>Thanks for using ECHO</p><p>2024 Copyright ECHO©</p> <h2>Report any bugs at quinndevfacthound@gmail.com</h2> <a href="mailto:quinndevfacthound@gmail.com">Compose Email Here</a>
+    <h1 class="rainbow-text">About ECHO</h1>
+    <p>ECHO is a Tool where you can look up information, ECHO will hunt it for you via wikipedia.</p> <h1 class="rainbow-text">Version</h1> <p>V0.1</p> <p>© 2024 ECHO. All rights reserved.</p> <h2>Report any bugs at quinndevfacthound@gmail.com</h2> <a href="mailto:quinndevfacthound@gmail.com">Compose Email Here</a>
 
 </div></div>
        
