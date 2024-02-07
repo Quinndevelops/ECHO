@@ -161,6 +161,28 @@
             animation: rainbow 8s linear infinite;
             text-align: center;
         }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        #outputText {
+            margin-top: 20px;
+        }
+ .scrollable-div {
+        width: 300px;
+        height: 450px; /* Set the desired height */
+        overflow: auto; /* Enable scrolling */
+        border: 0.1px solid #1c1c1d; /* Add a border for visualization */
+        padding: 10px; /* Optional: Add padding for content */
+    }
     </style>
 </head>
 <body>
@@ -173,7 +195,7 @@
     </div>
 
     <!-- Main content -->
-    <div id="contentSection" style="display: none;">
+   <div id="contentSection" style="display: none;">
         <button onclick="restartCode()" class="back-button">Back</button>
         <select class="dropdown" onchange="selectOption(this)">
             <option>Article Finder</option>
@@ -187,9 +209,11 @@
         <div style="text-align: center;">
             <button onclick="searchArticle()" class="search">Search</button>
         </div>
+
         <div id="result"></div>
         <div id="images">
             <h1 style="text-align: center;">Images</h1>
+<h4>© 2024 ECHO. All rights reserved.</h4>
             <!-- Images will be displayed here -->
         </div>
     </div>
@@ -222,9 +246,14 @@
             <option>Article Finder</option>
         </select>
         <h1 class="rainbow-text">Pro-AI</h1>
-<h3>Coming Soon!</h3>
-<p style="text-align: center;">Pro-Ai Was Created By ProCreations Not By ECHO © 2023 Pro AI. All rights reserved.</p>
-        <!-- Content for the Pro-AI page goes here -->
+        <div class="container">
+            <input type="text" id="inputText" placeholder="Enter text"><br>
+            <button onclick="sendRequest()" class="search">Ask-Ai</button>
+<div class="scrollable-div">
+            <p id="outputText">Pro-AI Response Will Be Here</p>
+
+<p style="text-align: center;">Pro-Ai Is Made By ProCreations © 2023 Pro AI. All rights reserved.</p>
+  </div>      </div>
     </div>
 
     <script>
@@ -270,88 +299,95 @@
         function goBack() {
             window.history.back();
         }
-let currentAnimation;
+
         // Remaining script (unchanged)
+
+let currentAnimation;
         function searchArticle() {
-            // Clear previous animation if running
-            if (currentAnimation) {
+    // Clear previous animation if running
+    if (currentAnimation) {
+        clearInterval(currentAnimation);
+    }
+
+    const originalInput = document.getElementById('searchInput').value;
+    const formattedInput = originalInput.replace(/\s/g, '_'); // Replace spaces with underscores
+    const apiUrlOriginal = `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts|pageimages&exintro=true&titles=${formattedInput}&pithumbsize=300&origin=*`;
+
+    console.log("API URL:", apiUrlOriginal); // Debug statement
+
+    // Function to sanitize HTML content
+    function sanitizeHTML(html) {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        return doc.body.textContent || "";
+    }
+
+    // Function to handle API response with typewriter animation
+    function handleResponseWithTypewriter(data) {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = '';
+
+        const page = data.query.pages;
+        const firstPageId = Object.keys(page)[0];
+
+        console.log("Page ID:", firstPageId); // Debug statement
+
+        if (firstPageId === '-1' || !page[firstPageId].hasOwnProperty('extract')) {
+            throw new Error('Article not found');
+        }
+
+        const extract = sanitizeHTML(page[firstPageId].extract);
+        const characters = extract.split('');
+
+        let currentIndex = 0;
+
+        // Display characters with typewriter effect
+        currentAnimation = setInterval(() => {
+            if (currentIndex < characters.length) {
+                resultDiv.innerHTML += characters[currentIndex];
+                // Scroll to the bottom as text appears
+                resultDiv.scrollTop = resultDiv.scrollHeight;
+                currentIndex++;
+            } else {
                 clearInterval(currentAnimation);
             }
+        }, 1);
 
-            const originalInput = document.getElementById('searchInput').value;
-            const formattedInput = originalInput.replace(/\s/g, '_'); // Replace spaces with underscores
-            const apiUrlOriginal = `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts|pageimages&exintro=true&titles=${formattedInput}&pithumbsize=300&origin=*`;
+        // Display images
+        const imagesContainer = document.getElementById('images');
+        imagesContainer.innerHTML = '';
 
-            const lowercaseInput = originalInput.toLowerCase();
-            const formattedLowercaseInput = lowercaseInput.replace(/\s/g, '_');
-            const apiUrlLowercase = `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts|pageimages&exintro=true&titles=${formattedLowercaseInput}&pithumbsize=300&origin=*`;
-
-            // Function to sanitize HTML content
-            function sanitizeHTML(html) {
-                const doc = new DOMParser().parseFromString(html, 'text/html');
-                return doc.body.textContent || "";
-            }
-
-            // Function to handle API response with typewriter animation
-            function handleResponseWithTypewriter(data) {
-                const resultDiv = document.getElementById('result');
-                resultDiv.innerHTML = '';
-
-                const page = data.query.pages;
-                const firstPageId = Object.keys(page)[0];
-
-                if (firstPageId === '-1' || !page[firstPageId].hasOwnProperty('extract')) {
-                    throw new Error('Article not found');
-                }
-
-                const extract = sanitizeHTML(page[firstPageId].extract);
-                const characters = extract.split('');
-
-                let currentIndex = 0;
-
-                // Display characters with typewriter effect
-                currentAnimation = setInterval(() => {
-                    if (currentIndex < characters.length) {
-                        resultDiv.innerHTML += characters[currentIndex];
-                        // Scroll to the bottom as text appears
-                        resultDiv.scrollTop = resultDiv.scrollHeight;
-                        currentIndex++;
-                    } else {
-                        clearInterval(currentAnimation);
-                    }
-                }, 1);
-
-                // Display images
-                const imagesContainer = document.getElementById('images');
-                imagesContainer.innerHTML = '';
-
-                if (page[firstPageId].hasOwnProperty('thumbnail')) {
-                    const image = document.createElement('img');
-                    image.src = page[firstPageId].thumbnail.source;
-                    imagesContainer.appendChild(image);
-                }
-
-                // Display "Images" label only if images are present
-                if (imagesContainer.hasChildNodes()) {
-                    const imagesLabel = document.createElement('h2');
-                    imagesLabel.textContent = 'Images';
-                    imagesContainer.insertBefore(imagesLabel, imagesContainer.firstChild);
-                }
-            }
-
-            // Attempt with original input
-            fetch(apiUrlOriginal)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => handleResponseWithTypewriter(data))
-                .catch(() => {
-                    // If the original request fails, try with lowercase input (unchanged part)
-                });
+        if (page[firstPageId].hasOwnProperty('thumbnail')) {
+            const image = document.createElement('img');
+            image.src = page[firstPageId].thumbnail.source;
+            imagesContainer.appendChild(image);
         }
+
+        // Display "Images" label only if images are present
+        if (imagesContainer.hasChildNodes()) {
+            const imagesLabel = document.createElement('h2');
+            imagesLabel.textContent = 'Images';
+            imagesContainer.insertBefore(imagesLabel, imagesContainer.firstChild);
+        }
+    }
+
+    // Attempt with original input
+    fetch(apiUrlOriginal)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("API Response:", data); // Debug statement
+            handleResponseWithTypewriter(data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            // If the original request fails, try with lowercase input (unchanged part)
+        });
+}
+
 
         function restartCode() {
             location.reload();
@@ -385,6 +421,29 @@ let currentAnimation;
         // Initial call to display time immediately
         updateTime();
 
+        function sendRequest() {
+            const input = { "input": document.getElementById('inputText').value };
+            fetch('https://pro-ai.glitch.me/api-pro-chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(input)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var outputText = document.getElementById('outputText');
+                    outputText.textContent = data.response;
+                })
+                .catch(error => {
+                    var outputText = document.getElementById('outputText');
+                    outputText.textContent = 'Error Please Try Again Later';
+                    console.error('Error:', error);
+                });
+        }
     </script>
 </body>
 </html>
